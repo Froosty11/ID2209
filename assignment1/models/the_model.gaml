@@ -43,11 +43,6 @@ species FestivalGuest skills:[moving]{
 	int thirst <- rnd(5,70);
 	int whenThirsty <- 100;
 	
-	init {
-		loop s over: information {
-			write s;
-		}
-	}
 	
 	
 	reflex getHungry {
@@ -65,7 +60,7 @@ species FestivalGuest skills:[moving]{
 	}
 	
 	reflex getThirsty {
-		thirst <- thirst + rnd(0,3);
+		thirst <- thirst + rnd(3,5);
 		if thirst > whenThirsty {
 			if (waterStore != nil) {
 				target <- waterStore;
@@ -84,21 +79,21 @@ species FestivalGuest skills:[moving]{
 	reflex moveToTarget when: target != nil {
 		do goto target:target;
 	}
-	reflex enterStore when: target != nil and location distance_to(target.location) < 5 {
+	reflex enterStore when: target != nil and location distance_to(target.location) < 2 {
 	
-		ask Information_center at_distance(5) {
-			if (myself.hunger > myself.whenHungry) {
+		ask Information_center at_distance(2) {
+			if (myself.hunger > myself.whenHungry and myself.foodStore = nil) {
 				Store food <- askHunger();
 				myself.foodStore <- food;
 			}
-			else if (myself.thirst > myself.whenThirsty) {
+			else if (myself.thirst > myself.whenThirsty and myself.waterStore = nil) {
 				Store water <- askWater();
 				myself.waterStore <- water;
 			}
 		
 		}
 		
-		ask Store at_distance(5) {
+		ask Store at_distance(2) {
 			if (self.storetype = 'foodStore' and myself.hunger > myself.whenHungry) {
 				write 'äter vid store';
 				if (flip(0.3)) {
