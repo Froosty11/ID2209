@@ -33,41 +33,48 @@ global {
 
 species FestivalGuest skills:[moving]{
 	list<Information_center> information <- agents of_species Information_center;
+	Information_center info_center <- information at 0;
+	
 	agent target <- nil;
 	Store foodStore <- nil;
 	Store waterStore <- nil;
 	
 	int hunger <- rnd(5,70);
 	int whenHungry <- 100;
+	bool hungry <- false;
 	
 	int thirst <- rnd(5,70);
 	int whenThirsty <- 100;
+	bool thirsty <- false;
 	
 	
 	
 	reflex getHungry {
 		hunger <- hunger + rnd(0,3);
-		if hunger > whenHungry {
+		hungry <- hunger > whenHungry;
+		if hungry and target = nil{
 			if (foodStore != nil) {
 				target <- foodStore;
 			}
 			else {
-				Information_center asd <- information at 0;
-				target <- asd;
+				target <- info_center;
 			}
-	
+		
 		}
+		write 'hunger: ' + hunger;
+		write 'thirst: ' + thirst;
 	}
 	
 	reflex getThirsty {
 		thirst <- thirst + rnd(3,5);
-		if thirst > whenThirsty {
+		thirsty <- thirst > whenThirsty;
+		if thirsty and target = nil{
 			if (waterStore != nil) {
 				target <- waterStore;
 			}
 			else {
-				Information_center asd <- information at 0;
-				target <- asd;
+		
+				target <- info_center;
 			}
 	
 		}
@@ -86,28 +93,33 @@ species FestivalGuest skills:[moving]{
 				Store food <- askHunger();
 				myself.foodStore <- food;
 			}
-			else if (myself.thirst > myself.whenThirsty and myself.waterStore = nil) {
+			if (myself.thirst > myself.whenThirsty and myself.waterStore = nil) {
 				Store water <- askWater();
 				myself.waterStore <- water;
 			}
+			myself.target <- nil;
 		
 		}
 		
 		ask Store at_distance(2) {
-			if (self.storetype = 'foodStore' and myself.hunger > myself.whenHungry) {
+			if (self.storetype = 'foodStore' and myself.hungry) {
 				write 'äter vid store';
 				if (flip(0.3)) {
+					write 'reseting foodstore location';
 					myself.foodStore <- nil;
 				}
 				myself.hunger <- 0;
+				myself.hungry <- false;
 				myself.target <- nil;
 			}
-			else if (self.storetype = 'waterStore' and myself.thirst > myself.whenThirsty) {
+			else if (self.storetype = 'waterStore' and myself.thirsty) {
 				write 'dricker vid store';
-				if (flip(0.3)) {
+				if (flip(0.5)) {
+					write 'reseting waterstore location';
 					myself.waterStore <- nil;
 				}
 				myself.thirst <- 0;
+				myself.thirsty <- false;
 				myself.target <- nil;
 			}
 		}
@@ -138,9 +150,6 @@ species Information_center {
 	Store askHunger {
 			int i <- rnd(0, length(foodStores) - 1);
 			Store test <- foodStores at i;
-			write 'returning hunger store';
-			write i;
-			write test.location;
 			return test;
 		
 	}
