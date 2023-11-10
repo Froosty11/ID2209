@@ -69,25 +69,22 @@ species FestivalGuest skills:[moving]{
 		hunger <- hunger + rnd(leastHunger, mostHunger); //How much hunger should be lost every tick.  We measure hunger/thirst as positive is more hungry. 
 		hungry <- hunger > whenHungry;
 		if hungry and target = nil{
-			write("Hungry!");
 			if (foodStore != nil) {
 				target <- foodStore;
 			}
 			else {
 				target <- info_center;
-				write(" Going to info");
 			}
 		
 		}
-		//write 'hunger: ' + hunger;
-		//write 'thirst: ' + thirst;
+		write 'hunger: ' + hunger;
+		write 'thirst: ' + thirst;
 	}
 	
 	reflex getThirsty {
 		thirst <- thirst + rnd(leastThirst,mostThirst);  //How much thirst should be lost every tick. We measure hunger/thirst as positive is more hungry. 
 		thirsty <- thirst > whenThirsty;
 		if thirsty and target = nil{
-			write("Thirsty!");
 			if (waterStore != nil) {
 				target <- waterStore;
 			}
@@ -110,12 +107,10 @@ species FestivalGuest skills:[moving]{
 		ask Information_center at_distance(2) {
 			if (myself.hunger > myself.whenHungry and myself.foodStore = nil) {
 				Store food <- askHunger();
-				write("Asked info, target changed");
 				myself.foodStore <- food;
 			}
 			if (myself.thirst > myself.whenThirsty and myself.waterStore = nil) {
 				Store water <- askWater();
-				write("Asked info, target changed");
 				myself.waterStore <- water;
 			}
 			if (myself.angry and self.guard.target = nil) {
@@ -127,7 +122,7 @@ species FestivalGuest skills:[moving]{
 		
 		ask Store at_distance(2) {
 			if (self.storetype = 'foodStore' and myself.hungry) {
-				write 'äter vid store';
+				//write 'äter vid store';
 				if (flip(forgetOdds)) {
 					write 'reseting foodstore location';
 					myself.foodStore <- nil;
@@ -137,7 +132,7 @@ species FestivalGuest skills:[moving]{
 				myself.target <- nil;
 			}
 			else if (self.storetype = 'waterStore' and myself.thirsty) {
-				write 'dricker vid store';
+				//write 'dricker vid store';
 				if (flip(forgetOdds)) {
 					//write 'reseting waterstore location';
 					myself.waterStore <- nil;

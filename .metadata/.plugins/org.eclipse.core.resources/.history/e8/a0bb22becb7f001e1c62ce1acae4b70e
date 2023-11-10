@@ -87,7 +87,6 @@ species FestivalGuest skills:[moving]{
 		thirst <- thirst + rnd(leastThirst,mostThirst);  //How much thirst should be lost every tick. We measure hunger/thirst as positive is more hungry. 
 		thirsty <- thirst > whenThirsty;
 		if thirsty and target = nil{
-			write("Thirsty!");
 			if (waterStore != nil) {
 				target <- waterStore;
 			}
@@ -127,7 +126,7 @@ species FestivalGuest skills:[moving]{
 		
 		ask Store at_distance(2) {
 			if (self.storetype = 'foodStore' and myself.hungry) {
-				write 'äter vid store';
+				//write 'äter vid store';
 				if (flip(forgetOdds)) {
 					write 'reseting foodstore location';
 					myself.foodStore <- nil;
@@ -137,7 +136,7 @@ species FestivalGuest skills:[moving]{
 				myself.target <- nil;
 			}
 			else if (self.storetype = 'waterStore' and myself.thirsty) {
-				write 'dricker vid store';
+				//write 'dricker vid store';
 				if (flip(forgetOdds)) {
 					//write 'reseting waterstore location';
 					myself.waterStore <- nil;
