@@ -25,8 +25,10 @@ global {
 		create Store with: (storetype: 'waterStore');
 		create Store with: (storetype: 'foodStore');
 		create Store number: number_of_stores - 2;
+		create SecurityGuard number: 1;
 		create Information_center with: (location: info_center_location);
 		create FestivalGuest number:number_of_guests;
+		
 	
 	}
 }
@@ -34,6 +36,7 @@ global {
 species FestivalGuest skills:[moving]{
 	list<Information_center> information <- agents of_species Information_center;
 	Information_center info_center <- information at 0;
+	
 	
 	agent target <- nil;
 	Store foodStore <- nil;
@@ -46,6 +49,8 @@ species FestivalGuest skills:[moving]{
 	int thirst <- rnd(5,70);
 	int whenThirsty <- 100;
 	bool thirsty <- false;
+	
+	bool angry <- flip(0.3);
 	
 	
 	
@@ -97,6 +102,9 @@ species FestivalGuest skills:[moving]{
 				Store water <- askWater();
 				myself.waterStore <- water;
 			}
+			if (myself.angry and self.guard.target = nil) {
+				self.guard.target <- myself;
+			}
 			myself.target <- nil;
 		
 		}
@@ -125,7 +133,7 @@ species FestivalGuest skills:[moving]{
 		}
 	}
 	aspect base {
-		draw circle(1) color: #green;
+		draw circle(1) color: angry ? #red : #green;
 	}
 	
 }
@@ -134,6 +142,11 @@ species Information_center {
 	list<Store> stores <- agents of_species Store;
 	list<Store> foodStores <- nil;
 	list<Store> waterStores <- nil;
+	
+	list<SecurityGuard> guards <- agents of_species SecurityGuard;
+	SecurityGuard guard <- guards at 0;
+	
+	
 	init {
 		loop s over: stores {
 			if (s.storetype = 'foodStore') {
@@ -167,9 +180,41 @@ species Information_center {
 
 species Store {
 	string storetype <- flip(0.5) ? 'waterStore' : 'foodStore';
+	
+	
 
 	aspect base {
 		draw circle(2) color: storetype = 'waterStore' ? #blue : #brown;
+	}
+	
+}
+
+species SecurityGuard skills:[moving]{
+	agent target <- nil;
+	
+	init {
+		speed <- 1.2;
+	}
+	
+	reflex beIdle when: target = nil {
+		do wander;
+	}
+	reflex moveToTarget when: target != nil {
+		do goto target:target;
+		
+		if (!dead(target) and location distance_to(target.location) < 2) {
+			ask target {
+				do die;
+			}
+			target <- nil;
+		}
+		
+	}
+	
+	
+
+	aspect base {
+		draw triangle(4) color: #black;
 	}
 	
 }
@@ -180,6 +225,7 @@ experiment my_test type: gui {
 			species FestivalGuest aspect:base;
 			species Store aspect:base;
 			species Information_center aspect:base;
+			species SecurityGuard  aspect:base;
 		}
 	}
 }
